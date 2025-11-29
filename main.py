@@ -4,6 +4,7 @@ from sqlalchemy import text
 from contextlib import asynccontextmanager
 
 from routers.user.user import router as user_router
+from routers.function.functions import router as function_router
 
 from database import init_resources, close_resources
 
@@ -21,3 +22,4 @@ async def app_lifespan(app: FastAPI):
 app = FastAPI(lifespan=app_lifespan)
 
 app.include_router(user_router)
+app.include_router(function_router)
