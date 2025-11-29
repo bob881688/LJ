@@ -14,11 +14,11 @@ from fastapi import APIRouter
 from pathlib import Path
 
 from database import get_db
-from routers.user.user_schemas import (
+from routers.user.depands.user_schemas import (
     UserRegisterRequest,
     UserResponse,
 )
-from routers.user.security import hash_password, get_current_user
+from routers.user.depands.security import hash_password, get_current_user
 
 
 router = APIRouter()
