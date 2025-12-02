@@ -11,6 +11,7 @@ from rubyinserter import add_ruby
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+# 傳入日文文字，輸出 out.wav
 def tts(input_prompt):
     model = ParlerTTSForConditionalGeneration.from_pretrained("2121-8/japanese-parler-tts-mini").to(device) # type: ignore
     prompt_tokenizer = AutoTokenizer.from_pretrained("2121-8/japanese-parler-tts-mini", subfolder="prompt_tokenizer")
