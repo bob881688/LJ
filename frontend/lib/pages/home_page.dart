@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../screens/start_screen.dart';
+import '../screens/favorites_screen.dart';
+import '../screens/history_screen.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
@@ -38,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         '【示範】今日新聞標題 ${i + 1}（見出し）',
         '這是第${i + 1}篇新聞的摘要，摘要會顯示最多三行來預覽內容，方便使用者快速掃描。長文字會被截斷顯示 …',
         'https://www.example.com/news/${i + 1}',
-        '', // image URL 或 assets path（留空則顯示預設色塊）
+        '', // image URL 或 assets path（留空顯示預設色塊）
         now.subtract(Duration(hours: i * 2)),
       ));
     }
@@ -72,7 +76,14 @@ class _HomePageState extends State<HomePage> {
         const Icon(Icons.newspaper, size: 28, color: Colors.white70),
         const SizedBox(width: 10),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('今日日本新聞', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+              '今日日本新聞',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white70,
+              )
+          ),
           const SizedBox(height: 2),
           Text('$dateText （本日）', style: const TextStyle(fontSize: 12, color: Colors.white54)),
         ]),
@@ -145,7 +156,7 @@ class _HomePageState extends State<HomePage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(n.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(n.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white70), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 8),
                 Text(n.summary, style: const TextStyle(color: Colors.white70), maxLines: 3, overflow: TextOverflow.ellipsis),
                 const Spacer(),
@@ -186,7 +197,7 @@ class _HomePageState extends State<HomePage> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             leading: Container(width: 64, height: 64, decoration: BoxDecoration(color: Colors.grey.shade800, borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.play_circle_outline, color: Colors.white30)),
-            title: Text('推薦影片標題 ${i + 1}（おすすめ）', style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text('推薦影片標題 ${i + 1}（おすすめ）', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70)),
             subtitle: const Text('短描述（短い説明）', style: TextStyle(color: Colors.white70)),
             trailing: ElevatedButton(onPressed: () {}, child: const Text('觀看（見る）')),
           ),
@@ -199,7 +210,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
-        backgroundColor: const Color(0xFF0F0F0F),
+        backgroundColor: const Color(0xFF1A1A1A),
         child: SafeArea(
           child: Column(children: [
             const UserAccountsDrawerHeader(
@@ -208,14 +219,45 @@ class _HomePageState extends State<HomePage> {
               accountName: Text('使用者名稱（ユーザー名）'),
               accountEmail: Text('user@example.com'),
             ),
-            ListTile(leading: const Icon(Icons.book), title: const Text('語句收藏（保存した例文）'), onTap: () {}),
-            ListTile(leading: const Icon(Icons.history), title: const Text('學習紀錄（学習履歴）'), onTap: () {}),
-            ListTile(leading: const Icon(Icons.settings), title: const Text('使用者設定（設定）'), onTap: () {
+            ListTile(
+              leading: const Icon(Icons.rocket_launch, color: Colors.white), // 白色圖示
+              title: const Text('開始練習（始める）', style: TextStyle(color: Colors.white)), // 白色文字
+              onTap: () {
+                Navigator.pop(context); // 關選單
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StartScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book, color: Colors.white),
+              title: const Text('語句收藏（保存した例文）', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history, color: Colors.white),
+              title: const Text('學習紀錄（学習履歴）', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(leading: const Icon(Icons.settings, color: Colors.white), title: const Text('使用者設定（設定）', style: TextStyle(color: Colors.white)), onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/settings');
             }),
-            const Divider(),
-            ListTile(leading: const Icon(Icons.info), title: const Text('關於（このアプリについて）'), onTap: () {}),
+            ListTile(leading: const Icon(Icons.info, color: Colors.white), title: const Text('關於（このアプリについて）', style: TextStyle(color: Colors.white)), onTap: () {}),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -231,7 +273,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF151515),
         elevation: 0,
-        title: const Text('NihongoGo'),
+        title: const Text('LJ'),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search), tooltip: '搜尋（検索）'),
           IconButton(onPressed: () {}, icon: const Icon(Icons.filter_list), tooltip: '篩選（フィルター）'),
@@ -240,58 +282,58 @@ class _HomePageState extends State<HomePage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _loadMock,
-              child: ListView(
-                children: [
-                  const SizedBox(height: 8),
-                  _buildTopBar(),
-                  const SizedBox(height: 8),
-                  _buildChips(),
-                  const SizedBox(height: 12),
-                  // 橫向大卡（PageView）
-                  SizedBox(
-                    height: 200,
-                    child: PageView.builder(
-                      controller: PageController(viewportFraction: 0.92),
-                      itemCount: _list.length,
-                      itemBuilder: (context, idx) {
-                        final n = _list[idx];
-                        return _buildHeroCard(n);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // 推薦標題
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text('推薦（おすすめ）', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  ),
-                  _buildRecommendList(),
-                  const SizedBox(height: 8),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text('更多新聞（もっとニュース）', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ),
-                  // 列表
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Column(
-                      children: _list.map((n) {
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          tileColor: const Color(0xFF0F0F0F),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          title: Text(n.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(n.summary, maxLines: 2, overflow: TextOverflow.ellipsis),
-                          trailing: TextButton(onPressed: () => _open(n.url), child: const Text('原文（原文）')),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+        onRefresh: _loadMock,
+        child: ListView(
+          children: [
+            const SizedBox(height: 8),
+            _buildTopBar(),
+            const SizedBox(height: 8),
+            _buildChips(),
+            const SizedBox(height: 12),
+            // 橫向大卡（PageView）
+            SizedBox(
+              height: 200,
+              child: PageView.builder(
+                controller: PageController(viewportFraction: 0.92),
+                itemCount: _list.length,
+                itemBuilder: (context, idx) {
+                  final n = _list[idx];
+                  return _buildHeroCard(n);
+                },
               ),
             ),
+            const SizedBox(height: 10),
+            // 推薦標題
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text('推薦（おすすめ）', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white70)),
+            ),
+            _buildRecommendList(),
+            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text('更多新聞（もっとニュース）', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white70)),
+            ),
+            // 列表
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(
+                children: _list.map((n) {
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    tileColor: const Color(0xFF0F0F0F),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    title: Text(n.title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70)),
+                    subtitle: Text(n.summary, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70)),
+                    trailing: TextButton(onPressed: () => _open(n.url), child: const Text('原文（原文）', style: TextStyle(color: Color.fromARGB(179, 115, 1, 138)))),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
     );
   }
 }
