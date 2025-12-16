@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../screens/start_screen.dart';
-import '../screens/favorites_screen.dart';
-import '../screens/history_screen.dart';
+import 'start_screen.dart';
+import 'favorites_screen.dart';
+import 'history_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
