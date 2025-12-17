@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +22,7 @@ class UserSession {
 
 class loginAuth{
 	// http://10.0.2.2:8000
-	static const String baseUrl = "http://127.0.0.1:8000";
+	static const String baseUrl = "http://119.14.200.30:8000";
 	
 	/// Basic Auth: 以 Authorization: Basic base64(username:password)
   /// 呼叫後端 GET /users/me，成功回傳使用者資料。
@@ -38,7 +39,7 @@ class loginAuth{
           'Authorization': 'Basic $token',
           'Accept': 'application/json',
         },
-      );
+      ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         return json.decode(utf8.decode(response.bodyBytes))
@@ -48,9 +49,12 @@ class loginAuth{
         throw Exception('帳號或密碼錯誤');
       }
 
-      throw Exception('登入失敗（${response.statusCode}）');
+      throw Exception('登入失敗（${response.statusCode})');
     
-		} catch (e) {
+	} on TimeoutException {
+      throw Exception('連線逾時(20 秒)');
+
+    }catch (e) {
 	  	final msg = e.toString().replaceFirst('Exception: ', '');
 	  	// 保留明確的錯誤訊息（例如帳密錯誤、非 200 狀態碼），避免 UI 出現「連線錯誤: Exception: ...」
 	  	if (msg == '帳號或密碼錯誤' || msg.startsWith('登入失敗')) {

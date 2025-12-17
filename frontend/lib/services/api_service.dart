@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://10.0.2.2:8000";
+  static const String baseUrl = "http://119.14.200.30:8000";
 
   // 設定使用者 ID (目前寫死為 "1")
   static const String currentUserId = "1";
