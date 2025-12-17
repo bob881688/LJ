@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/settings': (context) => const SettingsPage(),
       },
-      home: const HomePage(),
+      home: const WelcomePage(),
     );
   }
 }

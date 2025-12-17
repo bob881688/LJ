@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/user_session.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,7 @@ class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _pw = TextEditingController();
   bool _loading = false;
+  bool _obscurePw = true;
   String? _error;
 
   @override
@@ -19,9 +21,24 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(children: [
-          TextField(controller: _email, decoration: const InputDecoration(labelText: '電子郵件（メール）')),
+          TextField(controller: _email, decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'), keyboardType: TextInputType.emailAddress, style: const TextStyle(color: Colors.white)),
           const SizedBox(height: 12),
-          TextField(controller: _pw, obscureText: true, decoration: const InputDecoration(labelText: '密碼（パスワード）')),
+          TextField(
+            controller: _pw,
+            obscureText: _obscurePw,
+            decoration: InputDecoration(
+              labelText: '密碼（パスワード）',
+              suffixIcon: IconButton(
+                tooltip: _obscurePw ? '顯示密碼' : '隱藏密碼',
+                icon: Icon(
+                  _obscurePw ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.white70,
+                ),
+                onPressed: () => setState(() => _obscurePw = !_obscurePw),
+              ),
+            ),
+            style: const TextStyle(color: Colors.white),
+          ),
           const SizedBox(height: 18),
           if (_error != null) Text(_error!, style: const TextStyle(color: Colors.redAccent)),
           const SizedBox(height: 6),
@@ -46,9 +63,23 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _error = '請輸入帳號與密碼（入力してください）');
       return;
     }
-    setState(() { _loading = true; _error = null; });
-    await Future.delayed(const Duration(milliseconds: 600)); // mock
-    setState(() { _loading = false; });
-    Navigator.pushReplacementNamed(context, '/home');
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      // 後端 /users/me 目前是用 Basic Auth 的 username:password
+      // 這裡先把輸入欄位當成 username 使用。
+      final user = await loginAuth.getCurrentUserBasic(email, pw);
+      UserSession.setUser(user);
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 }

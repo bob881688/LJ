@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/user_session.dart';
+
 import 'start_screen.dart';
 import 'favorites_screen.dart';
 import 'history_screen.dart';
@@ -213,11 +215,18 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color(0xFF1A1A1A),
         child: SafeArea(
           child: Column(children: [
-            const UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Colors.transparent),
-              currentAccountPicture: CircleAvatar(child: Icon(Icons.person)),
-              accountName: Text('使用者名稱（ユーザー名）'),
-              accountEmail: Text('user@example.com'),
+            ValueListenableBuilder<Map<String, dynamic>?>(
+              valueListenable: UserSession.currentUser,
+              builder: (context, user, _) {
+                final username = (user?['username'] as String?)?.trim();
+                final email = (user?['email'] as String?)?.trim();
+                return UserAccountsDrawerHeader(
+                  decoration: const BoxDecoration(color: Colors.transparent),
+                  currentAccountPicture: const CircleAvatar(child: Icon(Icons.person)),
+                  accountName: Text(username?.isNotEmpty == true ? username! : '使用者名稱（ユーザー名）'),
+                  accountEmail: Text(email?.isNotEmpty == true ? email! : '未登入（未ログイン）'),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.rocket_launch, color: Colors.white), // 白色圖示
@@ -263,7 +272,10 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, minimumSize: const Size.fromHeight(48)),
-                onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+                onPressed: () {
+                  UserSession.clear();
+                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                },
                 child: const Text('登出（ログアウト）'),
               ),
             )

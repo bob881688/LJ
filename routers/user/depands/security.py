@@ -59,7 +59,7 @@ def get_current_user(
     # 4. 組成要回傳／傳給路由的使用者物件（dict 或你自己的型別）
     # 這裡簡單用 dict，你也可以建一個簡單的資料類別
     return {
-        "id": row["id"],
+        "user_id": row["user_id"],
         "username": row["username"],
         "email": row["email"],
         "created_at": row["created_at"]
