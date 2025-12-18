@@ -8,7 +8,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _email = TextEditingController();
+  final _username = TextEditingController();
   final _pw = TextEditingController();
   bool _loading = false;
   bool _obscurePw = true;
@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(children: [
-          TextField(controller: _email, decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'), keyboardType: TextInputType.emailAddress, style: const TextStyle(color: Colors.white)),
+          TextField(controller: _username, decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'), keyboardType: TextInputType.emailAddress, style: const TextStyle(color: Colors.white)),
           const SizedBox(height: 12),
           TextField(
             controller: _pw,
@@ -57,9 +57,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
-    final email = _email.text.trim();
+    final username = _username.text.trim();
     final pw = _pw.text;
-    if (email.isEmpty || pw.isEmpty) {
+    if (username.isEmpty || pw.isEmpty) {
       setState(() => _error = '請輸入帳號與密碼（入力してください）');
       return;
     }
@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       // 後端 /users/me 目前是用 Basic Auth 的 username:password
       // 這裡先把輸入欄位當成 username 使用。
-      final user = await loginAuth.getCurrentUserBasic(email, pw);
+      final user = await loginAuth.getCurrentUserBasic(username, pw);
       UserSession.setUser(user);
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
