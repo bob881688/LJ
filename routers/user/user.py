@@ -62,8 +62,9 @@ def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="使用者建立失敗")
     else:
         return {
-            "id": row["id"],
+            "user_id": row["user_id"],
             "username": row["username"],
+            "email": row["email"],
             "created_at": row["created_at"],
         }
 
