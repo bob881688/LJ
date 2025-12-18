@@ -46,7 +46,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               decoration: const InputDecoration(
                 labelText: "日文",
                 labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
               ),
             ),
             TextField(
@@ -55,7 +57,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               decoration: const InputDecoration(
                 labelText: "意思 / 筆記",
                 labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
               ),
             ),
           ],
@@ -66,7 +70,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             child: const Text("取消", style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE57373)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE57373),
+            ),
             onPressed: () async {
               if (japaneseController.text.isNotEmpty) {
                 await ApiService.addFavorite(
@@ -93,33 +99,53 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("語句收藏", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text(
+              "語句收藏",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             Text("お気に入り", style: TextStyle(fontSize: 14, color: Colors.grey)),
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : notes.isEmpty
-          ? const Center(child: Text("目前沒有收藏", style: TextStyle(color: Colors.grey)))
-          : ListView.separated(
-        itemCount: notes.length,
-        separatorBuilder: (ctx, index) => const Divider(color: Colors.white24, height: 1),
-        itemBuilder: (ctx, index) {
-          final note = notes[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            title: Text(
-              note['japanese'],
-              style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              note['meaning'] ?? "",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          );
-        },
+      body: SafeArea(
+        top: false,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : notes.isEmpty
+            ? const Center(
+                child: Text("目前沒有收藏", style: TextStyle(color: Colors.grey)),
+              )
+            : ListView.separated(
+                itemCount: notes.length,
+                separatorBuilder: (ctx, index) =>
+                    const Divider(color: Colors.white24, height: 1),
+                itemBuilder: (ctx, index) {
+                  final note = notes[index];
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    title: Text(
+                      note['japanese'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      note['meaning'] ?? "",
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,

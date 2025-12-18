@@ -12,9 +12,15 @@ class WelcomePage extends StatelessWidget {
             const horizontalPadding = 16.0;
             const verticalPadding = 24.0;
 
-            final availableWidth = math.max(0.0, constraints.maxWidth - horizontalPadding * 2);
+            final availableWidth = math.max(
+              0.0,
+              constraints.maxWidth - horizontalPadding * 2,
+            );
             final cardWidth = math.min(320.0, availableWidth);
-            final cardHeight = (constraints.maxHeight * 0.45).clamp(240.0, 380.0);
+            final cardHeight = (constraints.maxHeight * 0.45).clamp(
+              240.0,
+              380.0,
+            );
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
@@ -23,7 +29,10 @@ class WelcomePage extends StatelessWidget {
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: math.max(0.0, constraints.maxHeight - verticalPadding * 2),
+                  minHeight: math.max(
+                    0.0,
+                    constraints.maxHeight - verticalPadding * 2,
+                  ),
                 ),
                 child: Center(
                   child: Column(
@@ -31,7 +40,10 @@ class WelcomePage extends StatelessWidget {
                     children: [
                       const Text(
                         'NihongoGo',
-                        style: TextStyle(fontSize: 44, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 44,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -49,7 +61,7 @@ class WelcomePage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               blurRadius: 10,
                             ),
                           ],
@@ -59,7 +71,10 @@ class WelcomePage extends StatelessWidget {
                           children: const [
                             Icon(Icons.school, size: 96, color: Colors.white24),
                             SizedBox(height: 12),
-                            Text('個人化推薦 • 即時回饋', style: TextStyle(color: Colors.white70)),
+                            Text(
+                              '個人化推薦 • 即時回饋',
+                              style: TextStyle(color: Colors.white70),
+                            ),
                             SizedBox(height: 6),
                             Text(
                               '學習新聞、影片、例句（ニュース・動画・例文）',
@@ -80,9 +95,15 @@ class WelcomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       OutlinedButton(
-                        onPressed: () => Navigator.pushNamed(context, '/register'),
-                        style: OutlinedButton.styleFrom(minimumSize: const Size(220, 50)),
-                        child: const Text('註冊（登録）', style: TextStyle(color: Colors.white)),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/register'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(220, 50),
+                        ),
+                        child: const Text(
+                          '註冊（登録）',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),

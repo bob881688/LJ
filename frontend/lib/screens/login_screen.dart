@@ -18,40 +18,60 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('登入（ログイン）')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(children: [
-          TextField(controller: _username, decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'), keyboardType: TextInputType.emailAddress, style: const TextStyle(color: Colors.white)),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _pw,
-            obscureText: _obscurePw,
-            decoration: InputDecoration(
-              labelText: '密碼（パスワード）',
-              suffixIcon: IconButton(
-                tooltip: _obscurePw ? '顯示密碼' : '隱藏密碼',
-                icon: Icon(
-                  _obscurePw ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.white70,
-                ),
-                onPressed: () => setState(() => _obscurePw = !_obscurePw),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              TextField(
+                controller: _username,
+                decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'),
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(color: Colors.white),
               ),
-            ),
-            style: const TextStyle(color: Colors.white),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _pw,
+                obscureText: _obscurePw,
+                decoration: InputDecoration(
+                  labelText: '密碼（パスワード）',
+                  suffixIcon: IconButton(
+                    tooltip: _obscurePw ? '顯示密碼' : '隱藏密碼',
+                    icon: Icon(
+                      _obscurePw ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
+                    ),
+                    onPressed: () => setState(() => _obscurePw = !_obscurePw),
+                  ),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 18),
+              if (_error != null)
+                Text(_error!, style: const TextStyle(color: Colors.redAccent)),
+              const SizedBox(height: 6),
+              _loading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _onLogin,
+                      child: const Text('登入（ログイン）'),
+                    ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () => Navigator.pushNamed(context, '/register'),
+                child: const Text('註冊（登録）'),
+              ),
+              const SizedBox(height: 20),
+              // 測試用按鈕：直接到 Home
+              TextButton(
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, '/home'),
+                child: const Text('前往首頁（テスト）'),
+              ),
+            ],
           ),
-          const SizedBox(height: 18),
-          if (_error != null) Text(_error!, style: const TextStyle(color: Colors.redAccent)),
-          const SizedBox(height: 6),
-          _loading ? const CircularProgressIndicator() : ElevatedButton(
-            onPressed: _onLogin,
-            child: const Text('登入（ログイン）'),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(onPressed: () => Navigator.pushNamed(context, '/register'), child: const Text('註冊（登録）')),
-          const SizedBox(height: 20),
-          // 測試用按鈕：直接到 Home
-          TextButton(onPressed: () => Navigator.pushReplacementNamed(context, '/home'), child: const Text('前往首頁（テスト）')),
-        ]),
+        ),
       ),
     );
   }
