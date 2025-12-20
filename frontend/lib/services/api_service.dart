@@ -54,7 +54,7 @@ class ApiService {
   // 語句收藏
   static Future<List<dynamic>> getFavorites() async {
     final userId = _requireCurrentUserId();
-    final url = Uri.parse('$baseUrl/api/favorites?user_id=$userId');
+    final url = Uri.parse('$baseUrl/api/favorites/?user_id=$userId');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

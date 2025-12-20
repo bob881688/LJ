@@ -419,12 +419,20 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('偏好設定（設定）', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            '偏好設定（設定）',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          ),
           const SizedBox(height: 10),
           // 日語程度
           Row(
             children: [
-              const Expanded(child: Text('日語程度（日本語レベル）')),
+              const Expanded(
+                child: Text(
+                  '日語程度（日本語レベル）',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
@@ -434,8 +442,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _level,
+                    style: const TextStyle(color: Colors.white),
+                    dropdownColor: const Color(0xFF1A1A1A),
+                    iconEnabledColor: Colors.white70,
                     items: _levels
-                        .map((l) => DropdownMenuItem(value: l, child: Text(l)))
+                        .map(
+                          (l) => DropdownMenuItem(
+                            value: l,
+                            child: Text(
+                              l,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) {
                       if (v != null) setState(() => _level = v);
@@ -448,7 +467,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 12),
 
           // 每日學習時長
-          const Text('每日學習時長（毎日の学習時間）'),
+          const Text('每日學習時長（毎日の学習時間）', style: TextStyle(color: Colors.white)),
           Row(
             children: [
               Expanded(
@@ -466,6 +485,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text(
                   '${_dailyMinutes.round()} 分鐘',
                   textAlign: TextAlign.right,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -473,7 +493,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 6),
 
           // 學習目標
-          const Text('學習目標（学習目標）'),
+          const Text('學習目標（学習目標）', style: TextStyle(color: Colors.white)),
           const SizedBox(height: 6),
           TextField(
             controller: _goalCtrl,
