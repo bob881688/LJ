@@ -34,6 +34,17 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadResources();
+    _loadDrawerAvatar();
+  }
+
+  Future<void> _loadDrawerAvatar() async {
+    try {
+      final settings = await ApiService.getUserSettingsPublic();
+      final url = (settings['avatar_url'] as String?)?.trim();
+      UserSession.setAvatarUrl(url);
+    } catch (e) {
+      // ignore
+    }
   }
 
   String? _typeFromFilter(String filter) {
@@ -382,8 +393,19 @@ class _HomePageState extends State<HomePage> {
                   final email = (user?['email'] as String?)?.trim();
                   return UserAccountsDrawerHeader(
                     decoration: const BoxDecoration(color: Colors.transparent),
-                    currentAccountPicture: const CircleAvatar(
-                      child: Icon(Icons.person),
+                    currentAccountPicture: ValueListenableBuilder<String?>(
+                      valueListenable: UserSession.avatarUrl,
+                      builder: (context, avatarUrl, _) {
+                        final url = avatarUrl?.trim();
+                        return CircleAvatar(
+                          backgroundImage: (url != null && url.isNotEmpty)
+                              ? NetworkImage(url)
+                              : null,
+                          child: (url == null || url.isEmpty)
+                              ? const Icon(Icons.person)
+                              : null,
+                        );
+                      },
                     ),
                     accountName: Text(
                       username?.isNotEmpty == true ? username! : '使用者名稱（ユーザー名）',

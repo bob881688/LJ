@@ -6,6 +6,20 @@ import 'user_session.dart';
 class ApiService {
   static const String baseUrl = "http://119.14.200.30:8000";
 
+  static Map<String, String> _basicHeaders(String username, String password) {
+    final token = base64Encode(utf8.encode('$username:$password'));
+    return {'Authorization': 'Basic $token', 'Accept': 'application/json'};
+  }
+
+  static String _requireCurrentUsername() {
+    final user = UserSession.currentUser.value;
+    final username = (user?['username'] ?? '').toString().trim();
+    if (username.isEmpty) {
+      throw Exception('尚未登入');
+    }
+    return username;
+  }
+
   static int _requireCurrentUserId() {
     final user = UserSession.currentUser.value;
     if (user == null) {
@@ -170,5 +184,96 @@ class ApiService {
     }
 
     return response.bodyBytes;
+  }
+
+  // 使用者設定（需 Basic Auth）
+  static Future<Map<String, dynamic>> getUserSettings({
+    required String password,
+  }) async {
+    final username = _requireCurrentUsername();
+    final url = Uri.parse('$baseUrl/users/settings');
+    final response = await http
+        .get(url, headers: _basicHeaders(username, password))
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('讀取設定失敗（${response.statusCode}）');
+    }
+    final decoded = json.decode(utf8.decode(response.bodyBytes));
+    if (decoded is Map<String, dynamic>) return decoded;
+    throw Exception('設定格式錯誤');
+  }
+
+  // 使用者設定（免密碼讀取；以 username query 參數）
+  static Future<Map<String, dynamic>> getUserSettingsPublic() async {
+    final username = _requireCurrentUsername();
+    final url = Uri.parse(
+      '$baseUrl/users/settings?username=${Uri.encodeQueryComponent(username)}',
+    );
+    final response = await http
+        .get(url, headers: {'Accept': 'application/json'})
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('讀取設定失敗（${response.statusCode}）');
+    }
+    final decoded = json.decode(utf8.decode(response.bodyBytes));
+    if (decoded is Map<String, dynamic>) return decoded;
+    throw Exception('設定格式錯誤');
+  }
+
+  static Future<void> saveUserSettings({
+    required String password,
+    required Map<String, dynamic> payload,
+  }) async {
+    final username = _requireCurrentUsername();
+    final url = Uri.parse('$baseUrl/users/settings');
+    final headers = {
+      ..._basicHeaders(username, password),
+      'Content-Type': 'application/json',
+    };
+    final response = await http
+        .put(url, headers: headers, body: json.encode(payload))
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('儲存設定失敗（${response.statusCode}）');
+    }
+  }
+
+  static Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final username = _requireCurrentUsername();
+    final url = Uri.parse('$baseUrl/users/change-password');
+    final headers = {
+      ..._basicHeaders(username, oldPassword),
+      'Content-Type': 'application/json',
+    };
+    final response = await http
+        .post(
+          url,
+          headers: headers,
+          body: json.encode({'new_password': newPassword}),
+        )
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      final bodyText = utf8.decode(response.bodyBytes);
+      throw Exception('變更密碼失敗（${response.statusCode}） $bodyText');
+    }
+  }
+
+  static Future<void> deleteAccount({required String password}) async {
+    final username = _requireCurrentUsername();
+    final url = Uri.parse('$baseUrl/users/me');
+    final response = await http
+        .delete(url, headers: _basicHeaders(username, password))
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('刪除帳號失敗（${response.statusCode}）');
+    }
   }
 }
