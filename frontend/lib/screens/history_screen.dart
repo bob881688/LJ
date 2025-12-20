@@ -13,6 +13,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<dynamic> currentDetails = []; // 當前選中的那場詳細內容
   int? selectedHistoryId; // 目前選中哪一場的 ID
   bool isLoading = true;
+  bool isNotLoggedIn = false;
 
   @override
   void initState() {
@@ -22,16 +23,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   // 載入練習場次
   void _loadSessions() async {
-    final data = await ApiService.getHistoryList();
-    if (mounted) {
+    try {
+      final data = await ApiService.getHistoryList();
+      if (!mounted) return;
+
       setState(() {
+        isNotLoggedIn = false;
         sessions = data;
+
         if (sessions.isNotEmpty) {
           // 預設選中第一筆 (最新的)
           _loadDetails(sessions[0]['id']);
         } else {
           isLoading = false;
         }
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        isNotLoggedIn = true;
+        isLoading = false;
+        sessions = [];
+        currentDetails = [];
+        selectedHistoryId = null;
       });
     }
   }
@@ -43,7 +57,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
 
     // 呼叫後端 API
-    final data = await ApiService.getHistoryDetails(historyId);
+    List<dynamic> data = [];
+    try {
+      data = await ApiService.getHistoryDetails(historyId);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        isNotLoggedIn = true;
+        isLoading = false;
+        currentDetails = [];
+      });
+      return;
+    }
 
     if (mounted) {
       setState(() {
@@ -79,6 +104,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         top: false,
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
+            : isNotLoggedIn
+            ? const Center(
+                child: Text("尚未登入帳號", style: TextStyle(color: Colors.white)),
+              )
             : sessions.isEmpty
             ? const Center(
                 child: Text(

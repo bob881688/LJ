@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 controller: _username,
                 decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'),
-                keyboardType: TextInputType.emailAddress,
+                keyboardType: TextInputType.text,
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 12),
