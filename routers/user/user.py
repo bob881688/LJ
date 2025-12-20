@@ -68,7 +68,7 @@ def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
             "created_at": row["created_at"],
         }
 
-@router.get("/users/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse)
 def read_current_user( user = Depends(get_current_user) ):
     """
     使用 Basic Auth 的 /users/me 範例：

@@ -1,9 +1,9 @@
 # import logging
 # from typing import Optional
 
-# from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request
 # from fastapi.exceptions import RequestValidationError
-# from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 # from fastapi.responses import JSONResponse
 from pathlib import Path
 from sqlalchemy import text
@@ -64,18 +64,18 @@ app = FastAPI(lifespan=app_lifespan)
 #         content={"detail": exc.errors()},
 #     )
 
-# # CORS（開發用）：
-# # Flutter Web / 瀏覽器在帶 Authorization header 時，會先發送 OPTIONS preflight。
-# # 沒有 CORS middleware 會導致 OPTIONS 405，前端常見顯示 "Failed to fetch"。
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=False,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+# CORS（開發用）：
+# Flutter Web / 瀏覽器在帶 Authorization header 時，會先發送 OPTIONS preflight。
+# 沒有 CORS middleware 會導致 OPTIONS 405，前端常見顯示 "Failed to fetch"。
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.include_router(user_router)
+app.include_router(user_router, prefix="/users")
 app.include_router(function_router)
 app.include_router(quiz_router, prefix="/api/quiz")
 app.include_router(favorites_router, prefix="/api/favorites")

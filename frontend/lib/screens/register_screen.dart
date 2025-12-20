@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/user_session.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -27,23 +28,27 @@ class _RegisterPageState extends State<RegisterPage> {
               TextField(
                 controller: _name,
                 decoration: const InputDecoration(labelText: '使用者名稱（ユーザー名）'),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _email,
                 decoration: const InputDecoration(labelText: '電子郵件（メール）'),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _pw,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: '密碼（パスワード）'),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _pw2,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: '確認密碼（確認パスワード）'),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 12),
               if (_msg != null)
@@ -76,11 +81,23 @@ class _RegisterPageState extends State<RegisterPage> {
       _loading = true;
       _msg = null;
     });
-    await Future.delayed(const Duration(milliseconds: 800));
+
+    try{
+      await RegisterAuth().registerUser(_name.text.trim(), _email.text.trim(), _pw.text);
+    }catch(e){
+      setState(() {
+        _loading = false;
+        _msg = e.toString().replaceAll('Exception: ', '');
+      });
+
+      return;
+    }
+
     setState(() {
       _loading = false;
       _msg = '註冊完成，請登入（登録完了、ログインしてください）';
     });
+
     Future.delayed(
       const Duration(seconds: 1),
       () => Navigator.pushReplacementNamed(context, '/login'),
