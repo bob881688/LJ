@@ -15,6 +15,7 @@ from routers.function.functions import router as function_router
 from routers.function.quiz import router as quiz_router
 from routers.function.favorites import router as favorites_router
 from routers.function.history import router as history_router
+from routers.function.resources import router as resources_router
 
 
 from database import init_resources, close_resources
@@ -80,3 +81,4 @@ app.include_router(function_router)
 app.include_router(quiz_router, prefix="/api/quiz")
 app.include_router(favorites_router, prefix="/api/favorites")
 app.include_router(history_router, prefix="/api/history")
+app.include_router(resources_router, prefix="/api/resources")

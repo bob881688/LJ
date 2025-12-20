@@ -1,8 +1,10 @@
 // lib/pages/home_page.dart
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/api_service.dart';
 import '../services/user_session.dart';
 
 import 'start_screen.dart';
@@ -23,40 +25,91 @@ class _News {
 
 class _HomePageState extends State<HomePage> {
   final List<_News> _list = [];
+  final List<_News> _recommend = [];
   bool _loading = false;
   String _filter = '全部（全て）';
-  final List<String> _chips = [
-    '全部（全て）',
-    '政治（政治）',
-    '經濟（経済）',
-    '文化（文化）',
-    '旅遊（旅行）',
-  ];
+  final List<String> _chips = ['全部（全て）', '文章（記事）', '影片（動画）'];
 
   @override
   void initState() {
     super.initState();
-    _loadMock();
+    _loadResources();
   }
 
-  Future<void> _loadMock() async {
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 400));
-    final now = DateTime.now();
-    _list.clear();
-    // 若有 assets 圖，可把 image 改為 'assets/images/news1.jpg'
-    for (var i = 0; i < 10; i++) {
-      _list.add(
-        _News(
-          '【示範】今日新聞標題 ${i + 1}（見出し）',
-          '這是第${i + 1}篇新聞的摘要，摘要會顯示最多三行來預覽內容，方便使用者快速掃描。長文字會被截斷顯示 …',
-          'https://www.example.com/news/${i + 1}',
-          '', // image URL 或 assets path（留空顯示預設色塊）
-          now.subtract(Duration(hours: i * 2)),
-        ),
-      );
+  String? _typeFromFilter(String filter) {
+    if (filter.startsWith('文章')) return 'article';
+    if (filter.startsWith('影片')) return 'video';
+    return null;
+  }
+
+  _News? _newsFromResource(dynamic r) {
+    if (r is! Map) return null;
+
+    final title = (r['name'] ?? '').toString();
+    final summary = (r['content'] ?? '').toString();
+    final url = (r['url'] ?? '').toString();
+
+    DateTime published = DateTime.now();
+    final rawTime = r['create_time'];
+    if (rawTime != null) {
+      final parsed = DateTime.tryParse(rawTime.toString());
+      if (parsed != null) published = parsed;
     }
-    setState(() => _loading = false);
+
+    if (title.isEmpty && summary.isEmpty && url.isEmpty) return null;
+    return _News(title, summary, url, '', published);
+  }
+
+  List<_News> _pickRandom(List<_News> items, int count) {
+    if (items.isEmpty || count <= 0) return [];
+    final copy = List<_News>.from(items);
+    copy.shuffle(Random());
+    return copy.take(count).toList();
+  }
+
+  Future<void> _loadResources() async {
+    setState(() => _loading = true);
+    final type = _typeFromFilter(_filter);
+
+    final results = await Future.wait([
+      ApiService.getResources(type: type),
+      ApiService.getResources(type: 'video'),
+    ]);
+
+    final rows = results[0];
+    final videoRows = results[1];
+
+    final List<_News> next = [];
+    for (final r in rows) {
+      final n = _newsFromResource(r);
+      if (n != null) next.add(n);
+    }
+
+    final List<_News> videos = [];
+    for (final r in videoRows) {
+      final n = _newsFromResource(r);
+      if (n != null) videos.add(n);
+    }
+
+    final recommends = videos.isNotEmpty ? videos : next;
+
+    setState(() {
+      _list
+        ..clear()
+        ..addAll(next);
+
+      _recommend
+        ..clear()
+        ..addAll(_pickRandom(recommends, 4));
+
+      _loading = false;
+    });
+
+    if (mounted && next.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('目前沒有可顯示的資源')));
+    }
   }
 
   Future<void> _open(String url) async {
@@ -113,7 +166,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: _loadMock,
+            onPressed: _loadResources,
             icon: const Icon(Icons.refresh_outlined),
             tooltip: '更新（更新）',
           ),
@@ -139,7 +192,7 @@ class _HomePageState extends State<HomePage> {
             selected: selected,
             onSelected: (v) {
               setState(() => _filter = label);
-              // 真正串後端時在這裡改參數重新抓取
+              _loadResources();
             },
             backgroundColor: const Color(0xFF2A2A2A),
             selectedColor: Colors.amberAccent,
@@ -266,7 +319,7 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
-        children: List.generate(4, (i) {
+        children: _recommend.map((n) {
           return Card(
             color: const Color(0xFF171717),
             margin: const EdgeInsets.symmetric(vertical: 8),
@@ -291,23 +344,25 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               title: Text(
-                '推薦影片標題 ${i + 1}（おすすめ）',
+                n.title.isNotEmpty ? n.title : '推薦（おすすめ）',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white70,
                 ),
               ),
-              subtitle: const Text(
-                '短描述（短い説明）',
-                style: TextStyle(color: Colors.white70),
+              subtitle: Text(
+                n.summary.isNotEmpty ? n.summary : ' ',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white70),
               ),
               trailing: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _open(n.url),
                 child: const Text('觀看（見る）'),
               ),
             ),
           );
-        }),
+        }).toList(),
       ),
     );
   }
@@ -458,7 +513,7 @@ class _HomePageState extends State<HomePage> {
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
-                onRefresh: _loadMock,
+                onRefresh: _loadResources,
                 child: ListView(
                   children: [
                     const SizedBox(height: 8),
@@ -542,7 +597,7 @@ class _HomePageState extends State<HomePage> {
                               child: const Text(
                                 '原文（原文）',
                                 style: TextStyle(
-                                  color: Color.fromARGB(179, 115, 1, 138),
+                                  color: Color.fromARGB(179, 200, 129, 214),
                                 ),
                               ),
                             ),

@@ -12,14 +12,17 @@ class ApiService {
     }
 
     final dynamic currendUserId = user['user_id'];
-    if (currendUserId != null){
-        return currendUserId;
+    if (currendUserId != null) {
+      return currendUserId;
     }
     throw Exception('找不到使用者 ID');
   }
 
   // 練習
-  static Future<Map<String, dynamic>> generateQuiz(String type, String level) async {
+  static Future<Map<String, dynamic>> generateQuiz(
+    String type,
+    String level,
+  ) async {
     final url = Uri.parse('$baseUrl/api/quiz/generate?type=$type&level=$level');
     try {
       final response = await http.get(url);
@@ -68,7 +71,11 @@ class ApiService {
   }
 
   // 學習紀錄
-  static Future<void> saveQuizResult(int score, int total, List<Map<String, dynamic>> details) async {
+  static Future<void> saveQuizResult(
+    int score,
+    int total,
+    List<Map<String, dynamic>> details,
+  ) async {
     final url = Uri.parse('$baseUrl/api/quiz/save');
     try {
       final userId = _requireCurrentUserId();
@@ -116,6 +123,28 @@ class ApiService {
       }
     } catch (e) {
       print("取得詳細失敗: $e");
+    }
+    return [];
+  }
+
+  // 資源（文章/影片）
+  static Future<List<dynamic>> getResources({String? type}) async {
+    final query = (type == null || type.trim().isEmpty)
+        ? ''
+        : '?type=${Uri.encodeQueryComponent(type.trim())}';
+    final url = Uri.parse('$baseUrl/api/resources/$query');
+    try {
+      final response = await http
+          .get(url, headers: {'Accept': 'application/json'})
+          .timeout(const Duration(seconds: 20));
+      if (response.statusCode == 200) {
+        final decoded = json.decode(utf8.decode(response.bodyBytes));
+        if (decoded is List) {
+          return decoded;
+        }
+      }
+    } catch (e) {
+      // 交給 UI 決定要不要顯示錯誤
     }
     return [];
   }
