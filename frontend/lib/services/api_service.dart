@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'user_session.dart';
 
@@ -147,5 +148,27 @@ class ApiService {
       // 交給 UI 決定要不要顯示錯誤
     }
     return [];
+  }
+
+  // TTS（後端回傳 wav bytes）
+  static Future<Uint8List> textToSpeechBytes(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) {
+      throw Exception('沒有可朗讀的文字');
+    }
+
+    final uri = Uri.parse(
+      '$baseUrl/text-to-speech',
+    ).replace(queryParameters: {'text': trimmed});
+
+    final response = await http
+        .get(uri, headers: {'Accept': 'audio/wav'})
+        .timeout(const Duration(seconds: 40));
+
+    if (response.statusCode != 200) {
+      throw Exception('TTS 失敗（${response.statusCode}）');
+    }
+
+    return response.bodyBytes;
   }
 }

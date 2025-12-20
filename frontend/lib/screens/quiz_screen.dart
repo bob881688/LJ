@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 // import 'package:flutter_tts/flutter_tts.dart'; // tts
 import '../services/api_service.dart';
 
@@ -21,6 +22,9 @@ class _QuizScreenState extends State<QuizScreen> {
   int? selectedIndex;
   bool selectedWasCorrect = false;
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _ttsLoading = false;
+
   // 每一題的變數
   List<Map<String, dynamic>> historyDetails = [];
   List<int> hasBeenSeenQuzid = [];
@@ -32,6 +36,12 @@ class _QuizScreenState extends State<QuizScreen> {
     super.initState();
     // initTts(); // tts
     loadNewQuestion();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   /* tts
@@ -76,13 +86,27 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void playSound() async {
-    print("tts");
-    /* tts
-    if (currentQuiz != null) {
-      String textToSpeak = currentQuiz!['question'];
-      await flutterTts.speak(textToSpeak);
+    if (_ttsLoading) return;
+    final quiz = currentQuiz;
+    if (quiz == null) return;
+
+    final text = (quiz['question'] ?? '').toString();
+    if (text.trim().isEmpty) return;
+
+    setState(() => _ttsLoading = true);
+    try {
+      final bytes = await ApiService.textToSpeechBytes(text);
+      await _audioPlayer.stop();
+      await _audioPlayer.play(BytesSource(bytes));
+    } catch (e) {
+      if (!mounted) return;
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('朗讀失敗：$msg')));
+    } finally {
+      if (mounted) setState(() => _ttsLoading = false);
     }
-    */
   }
 
   void _showResultDialog() {
