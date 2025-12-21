@@ -1,0 +1,16 @@
+main_old.py
+main_old2.py
+__pycache__/
+routers/__pycache__/
+routers/user/__pycache__/
+.env
+out.wav
+test.py
+.vscode/
+test.sql
+frontend/.dart_tool/
+frontend/build/
+frontend/linux/flutter/
+frontend/macos/Flutter/
+frontend/windows/flutter/
+frontend/android/.kotlin/sessions/kotlin-compiler-6781541494443549102.salive
