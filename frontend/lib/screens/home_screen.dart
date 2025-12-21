@@ -289,7 +289,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const Spacer(),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           '${n.published.hour.toString().padLeft(2, '0')}:${n.published.minute.toString().padLeft(2, '0')}',
@@ -298,21 +297,32 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white38,
                           ),
                         ),
-                        Row(
-                          children: [
-                            TextButton(
-                              onPressed: () => _open(n.url),
-                              child: const Text('原文（原文を開く）'),
-                            ),
-                            const SizedBox(width: 6),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.redAccent,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextButton(
+                                    onPressed: () => _open(n.url),
+                                    child: const Text('原文（原文を開く）'),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.redAccent,
+                                    ),
+                                    child: const Text('收藏（保存）'),
+                                  ),
+                                ],
                               ),
-                              child: const Text('收藏（保存）'),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
