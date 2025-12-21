@@ -16,8 +16,9 @@ class UserLoginRequest(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
+    user_id: int
     username: str
+    email: str
 
     class Config:
         from_attributes = True  # 允許直接用 ORM 物件轉換

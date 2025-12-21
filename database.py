@@ -4,10 +4,11 @@ from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 from sqlalchemy import text
 
-SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://appuser:passwordforDATAbase%21@127.0.0.1:5432/backend"
+from config import Settings
+settings = Settings()
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
+    settings.database_url
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
