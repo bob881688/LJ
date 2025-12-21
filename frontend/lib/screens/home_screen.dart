@@ -124,7 +124,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _open(String url) async {
-    final uri = Uri.tryParse(url);
+    final raw = url.trim();
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('無效的連結')));
+      return;
+    }
+    Uri? uri = Uri.tryParse(raw);
+    if (uri == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('無效的連結')));
+      return;
+    }
+
+    // 手機端（Android/iOS）通常需要明確的 scheme（http/https）。
+    if (uri.scheme.isEmpty) {
+      uri = Uri.tryParse('https://$raw');
+    }
     if (uri == null) {
       ScaffoldMessenger.of(
         context,
@@ -132,10 +150,10 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     try {
-      final can = await canLaunchUrl(uri);
-      if (can) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
+      // 不先用 canLaunchUrl：Android 11+ 若未在 Manifest 宣告 queries，
+      // canLaunchUrl 可能回傳 false，但 launchUrl 其實仍可正常開啟。
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('無法開啟連結')));
